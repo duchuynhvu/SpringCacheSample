@@ -1,6 +1,6 @@
 package com.example.springcache.model;
 
-import java.io.Serializable;
+import java.math.BigInteger;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -11,6 +11,8 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 
@@ -25,36 +27,36 @@ import lombok.Setter;
 @Entity
 @Getter
 @Setter
-@Table(name = "students")
-public class Student extends Person {
-    private static final long serialVersionUID = 4737929151590000928L;
+@Table(name = "lecturers")
+public class Lecturer extends Person {
+    private static final long serialVersionUID = 5103344973651067327L;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    
-    @Column
-    private Float gpa;
-    
+
+    @Column(nullable = false, columnDefinition = "bigint")
+    private BigInteger salary;
+
     @ManyToMany(
             fetch = FetchType.LAZY,
-            cascade = {CascadeType.MERGE, CascadeType.PERSIST},
-            mappedBy = "students"
+            cascade = {CascadeType.MERGE, CascadeType.PERSIST}
+    )
+    @JoinTable(
+            name = "lecturer_students", 
+            joinColumns = {@JoinColumn(name = "lecturer_id")}, 
+            inverseJoinColumns = {@JoinColumn(name = "student_id")}
     )
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JsonIgnore
-    private Set<Lecturer> lecturers = new HashSet<>();
+    private Set<Student> students = new HashSet<>();
 
-    public Student() {}
-    
-    public Student(String firstName, String lastName, Float gpa) {
-        super(firstName, lastName);
-        this.gpa = gpa;
+    public Lecturer() {
     }
 
-    public Student(Long id, String firstName, String lastName, Float gpa) {
+    public Lecturer(String firstName, String lastName, BigInteger salary) {
         super(firstName, lastName);
-        this.id = id;
-        this.gpa = gpa;
+        this.salary = salary;
     }
+
 }
